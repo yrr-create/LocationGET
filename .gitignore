@@ -18,3 +18,7 @@ sdk/
 
 # Logs
 *.log
+
+# Local installers and machine-specific shortcuts
+environment/*.exe
+environment/*.lnk

@@ -13,21 +13,39 @@
 - make
 - arm-none-eabi-gcc
 - Silicon Labs CP210x 串口设备，当前显示为 COM3
+- SEGGER Embedded Studio 8.28
+- SEGGER J-Link Software V7.94e
+- Nordic nRF Command-Line Tools 10.24.2
 
-缺失或未确认：
+已验证路径：
 
-- SEGGER Embedded Studio for ARM
-- SEGGER J-Link Software and Documentation Pack
-- Nordic Command Line Tools / nrfjprog
-- 可被电脑识别的 J-Link / ARM V12 调试器
+```text
+C:\Program Files\SEGGER\SEGGER Embedded Studio 8.28\bin\emStudio.exe
+C:\Program Files\SEGGER\JLink_V794e\JLink.exe
+C:\Program Files\SEGGER\JLink_V794e\JLinkGDBServerCL.exe
+C:\Program Files\Nordic Semiconductor\nrf-command-line-tools\bin\nrfjprog.exe
+```
 
-当前目录中的 `SEGGER Embedded Studio 8.28.lnk` 是坏快捷方式，目标路径不存在：
+已加入用户 PATH：
+
+```text
+C:\Program Files\SEGGER\SEGGER Embedded Studio 8.28\bin
+C:\Program Files\SEGGER\JLink_V794e
+C:\Program Files\Nordic Semiconductor\nrf-command-line-tools\bin
+```
+
+未完成：
+
+- 需要实际插上 ARM V12/J-Link，验证电脑能枚举调试器。
+- 需要接 EWT73 的 `3V3/GND/SWDIO/SWCLK`，验证 `Target -> Connect J-Link` 能连到 nRF52810。
+
+历史问题：当前目录中曾有 `SEGGER Embedded Studio 8.28.lnk` 坏快捷方式，目标路径不存在：
 
 ```text
 C:\Program Files\SEGGER\SEGGER Embedded Studio 8.28\bin\emStudio.exe
 ```
 
-安装 SEGGER Embedded Studio 后，需要重新创建或修正该快捷方式。
+现已修复为实际安装路径。快捷方式和安装包属于本机环境文件，不提交到 Git。
 
 ## 必装软件
 
@@ -123,3 +141,22 @@ Get-ChildItem -Path 'C:\Program Files','C:\Program Files (x86)' -Recurse -Filter
 ```
 
 然后把 `environment\SEGGER Embedded Studio 8.28.lnk` 的目标改为实际路径，或删除旧快捷方式后重新创建。
+
+## 当前验证命令
+
+新 PowerShell 中运行：
+
+```powershell
+where emStudio.exe
+where nrfjprog.exe
+where JLink.exe
+where JLinkGDBServerCL.exe
+nrfjprog --version
+JLink.exe -version
+```
+
+注意：Windows 上 `JLink.exe` 名称可能和 Java 的 `jlink.exe` 混淆。PATH 中应优先出现：
+
+```text
+C:\Program Files\SEGGER\JLink_V794e\JLink.exe
+```
