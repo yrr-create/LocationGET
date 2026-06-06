@@ -45,6 +45,50 @@ make ABSOLUTE_PATHS=1 PASS_INCLUDE_PATHS_VIA_FILE=1
 
 如果 GCC 版本太新导致 Nordic 旧代码告警被 `-Werror` 放大，可先用 SES 或安装 Nordic 当年推荐工具链。
 
+### 4. SES 8.28 编译 blinky 报 `.text/.rodata section is larger than specified size`
+
+日期：2026-06-06
+
+现象：
+```text
+error: .text section is larger than specified size
+error: .rodata section is larger than specified size
+```
+
+本次确认：
+- `blinky_pca10040e.emProject` 中 nRF52810 的 Flash/RAM 总大小是正确的：
+  - `FLASH_SIZE=0x30000`，即 192KB
+  - `RAM_SIZE=0x6000`，即 24KB
+- 真正触发错误的是 `ses\flash_placement.xml` 里这两行：
+
+```xml
+<ProgramSection alignment="4" load="Yes" name=".text" size="0x4" />
+<ProgramSection alignment="4" load="Yes" name=".rodata" size="0x4" />
+```
+
+处理方式：
+- 不删除 `FLASH_SIZE=0x30000`
+- 不把芯片改成 nRF52832
+- 只删除 `.text` 和 `.rodata` 的 `size="0x4"`：
+
+```xml
+<ProgramSection alignment="4" load="Yes" name=".text" />
+<ProgramSection alignment="4" load="Yes" name=".rodata" />
+```
+
+验证结果：
+```text
+emBuild.exe -config Debug -rebuild blinky_pca10040e.emProject
+```
+
+在当前电脑上已通过，并生成：
+
+```text
+Output\Debug\Exe\blinky_pca10040e.elf
+Output\Debug\Exe\blinky_pca10040e.hex
+Output\Debug\Exe\blinky_pca10040e.map
+```
+
 ## 新问题记录模板
 
 ### 标题
