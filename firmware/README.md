@@ -77,3 +77,19 @@ BLE UART 阶段需要：
 4. Reset
 
 亮灯 `blank` 阶段不需要 SoftDevice。
+
+## 已验证的 GPIO 试验
+
+2026-06-07 已确认 EWT73 板上 `P0.17` 和 `P0.18` 可由固件交替控制。
+
+本机 SDK 修改位置：
+
+```text
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\examples\peripheral\blinky\main.c
+```
+
+仓库中保存了对应 patch，换电脑时可参考或重新应用：
+
+```text
+firmware\patches\blinky-ewt73-p017-p018.patch
+```

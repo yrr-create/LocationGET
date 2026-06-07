@@ -1,0 +1,50 @@
+diff --git a/examples/peripheral/blinky/main.c b/examples/peripheral/blinky/main.c
+--- a/examples/peripheral/blinky/main.c
++++ b/examples/peripheral/blinky/main.c
+@@
+ #include <stdbool.h>
+ #include <stdint.h>
+ #include "nrf_delay.h"
+-#include "boards.h"
++#include "nrf_gpio.h"
++
++#define EWT73_LED_1_PIN 17
++#define EWT73_LED_2_PIN 18
++
++static void led_on(uint32_t pin)
++{
++    nrf_gpio_pin_clear(pin);
++}
++
++static void led_off(uint32_t pin)
++{
++    nrf_gpio_pin_set(pin);
++}
+@@
+ int main(void)
+ {
+-    /* Configure board. */
+-    bsp_board_init(BSP_INIT_LEDS);
++    nrf_gpio_cfg_output(EWT73_LED_1_PIN);
++    nrf_gpio_cfg_output(EWT73_LED_2_PIN);
++
++    led_off(EWT73_LED_1_PIN);
++    led_off(EWT73_LED_2_PIN);
+ 
+-    /* Toggle LEDs. */
+     while (true)
+     {
+-        for (int i = 0; i < LEDS_NUMBER; i++)
+-        {
+-            bsp_board_led_invert(i);
+-            nrf_delay_ms(500);
+-        }
++        led_on(EWT73_LED_1_PIN);
++        led_off(EWT73_LED_2_PIN);
++        nrf_delay_ms(500);
++
++        led_off(EWT73_LED_1_PIN);
++        led_on(EWT73_LED_2_PIN);
++        nrf_delay_ms(500);
+     }
+ }
