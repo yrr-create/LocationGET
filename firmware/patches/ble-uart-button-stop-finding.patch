@@ -1,0 +1,53 @@
+diff --git a/examples/ble_peripheral/ble_app_uart/main.c b/examples/ble_peripheral/ble_app_uart/main.c
+--- a/examples/ble_peripheral/ble_app_uart/main.c
++++ b/examples/ble_peripheral/ble_app_uart/main.c
+@@
+ static bool m_l4_finding = false;
++
++#define L4_BUTTON_SW1_PIN               14
++#define L4_BUTTON_SW2_PIN               13
++
++static bool m_l4_sw1_was_pressed = false;
++static bool m_l4_sw2_was_pressed = false;
+@@
++static void l4_buttons_init(void)
++{
++    nrf_gpio_cfg_input(L4_BUTTON_SW1_PIN, NRF_GPIO_PIN_PULLUP);
++    nrf_gpio_cfg_input(L4_BUTTON_SW2_PIN, NRF_GPIO_PIN_PULLUP);
++}
++
+ static void l4_set_finding(bool finding)
+ {
+     m_l4_finding = finding;
+@@
+ }
++
++static void l4_buttons_process(void)
++{
++    bool sw1_pressed = (nrf_gpio_pin_read(L4_BUTTON_SW1_PIN) == 0);
++    bool sw2_pressed = (nrf_gpio_pin_read(L4_BUTTON_SW2_PIN) == 0);
++
++    if (((sw1_pressed && !m_l4_sw1_was_pressed) ||
++         (sw2_pressed && !m_l4_sw2_was_pressed)) &&
++        m_l4_finding)
++    {
++        l4_set_finding(false);
++        l4_send_status();
++    }
++
++    m_l4_sw1_was_pressed = sw1_pressed;
++    m_l4_sw2_was_pressed = sw2_pressed;
++}
+@@
+     buttons_leds_init(&erase_bonds);
+     l4_leds_init();
++    l4_buttons_init();
+     power_management_init();
+@@
+     for (;;)
+     {
++        l4_buttons_process();
++
+         if (m_l4_finding)
+         {
+             l4_finding_process();
