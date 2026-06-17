@@ -180,6 +180,43 @@ hello from LocationGET
 firmware\patches\ble-uart-send-hello-on-notify.patch
 ```
 
+## AHT20 TWI driver files
+
+For the AHT20 temperature/humidity sensor, the firmware uses the nRF5 SDK
+legacy TWI driver:
+
+```c
+#include "nrf_drv_twi.h"
+```
+
+In `sdk_config.h`, enabling the TWI switches is not enough. SEGGER Embedded
+Studio only compiles source files that are explicitly listed in the `.emProject`
+file. Add these two files to the SES project under `nRF_Drivers`:
+
+```text
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\integration\nrfx\legacy\nrf_drv_twi.c
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\modules\nrfx\drivers\src\nrfx_twi.c
+```
+
+Required `sdk_config.h` switches:
+
+```c
+#define NRFX_TWI_ENABLED 1
+#define NRFX_TWI0_ENABLED 1
+#define TWI_ENABLED 1
+#define TWI0_ENABLED 1
+#define TWI0_USE_EASY_DMA 0
+```
+
+Current AHT20 wiring:
+
+```text
+EWT73 P0.11 -> AHT20 SDA
+EWT73 P0.12 -> AHT20 SCL
+EWT73 3V3   -> AHT20 VCC
+EWT73 GND   -> AHT20 GND
+```
+
 ## 下一步固件协议
 
 第 5 关进入资产标签控制协议。先继续使用 nRF Connect 手动写入 BLE UART RX characteristic 验证设备端，再开发 Android App。
