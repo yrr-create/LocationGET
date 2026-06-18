@@ -11,21 +11,25 @@ temperature and humidity.
 Current sensor wiring:
 
 ```text
-EWT73 P0.11 -> AHT20 SDA
-EWT73 P0.12 -> AHT20 SCL
-EWT73 3V3   -> AHT20 VCC
-EWT73 GND   -> AHT20 GND
+AHT20 VIN -> EWT73 3V3
+AHT20 GND -> EWT73 GND
+AHT20 SCL -> EWT73 P0.12
+AHT20 SDA -> EWT73 P0.11
 ```
 
 The buzzer remains on:
 
 ```text
-EWT73 P0.15 -> passive buzzer +
-EWT73 GND   -> passive buzzer -
+Passive buzzer + -> EWT73 P0.15
+Passive buzzer - -> EWT73 GND
 ```
 
 GND is a shared reference. If multiple peripherals need GND, use a breadboard
 GND rail or a splitter from one EWT73 GND pin.
+
+2026-06-18 correction: the purchased AHT20 board is marked `VIN`, not `VCC`.
+The earlier `aht=fail` result was caused by not powering the AHT20 VIN pin.
+After connecting `AHT20 VIN -> EWT73 3V3`, the sensor can be powered correctly.
 
 ## Firmware pins and address
 

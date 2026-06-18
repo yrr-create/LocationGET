@@ -211,11 +211,22 @@ Required `sdk_config.h` switches:
 Current AHT20 wiring:
 
 ```text
-EWT73 P0.11 -> AHT20 SDA
-EWT73 P0.12 -> AHT20 SCL
-EWT73 3V3   -> AHT20 VCC
-EWT73 GND   -> AHT20 GND
+AHT20 VIN -> EWT73 3V3
+AHT20 GND -> EWT73 GND
+AHT20 SCL -> EWT73 P0.12
+AHT20 SDA -> EWT73 P0.11
 ```
+
+Current buzzer wiring:
+
+```text
+Passive buzzer + -> EWT73 P0.15
+Passive buzzer - -> EWT73 GND
+```
+
+The AHT20 module used in this project is marked `VIN`, not `VCC`. `VIN` must
+be connected to EWT73 `3V3`; the buzzer does not connect to `3V3`. `GND` is a
+shared reference, so AHT20 GND and buzzer GND can both connect to EWT73 GND.
 
 ## 下一步固件协议
 

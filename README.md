@@ -1,4 +1,4 @@
-# LocationGET
+# AssetTracker
 
 Ebyte E73-2G4M04S1A / nRF52810 BLE warehouse asset tag prototype.
 
