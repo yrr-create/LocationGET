@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-The LocationGET tag now has a real sound-and-light finding behavior.
+The AssetTracker tag now has a real sound-and-light finding behavior.
 
 Verified behavior:
 
@@ -84,4 +84,3 @@ l4_buzzer_test_beep()
 ```
 
 Keep the current behavior first; cleanup can be a separate commit after another successful build and flash.
-

@@ -1,65 +1,55 @@
 # Hardware Notes
 
-## E73-2G4M04S1A
+本项目硬件主线是 EWT73 测试底板 + E73-2G4M04S1A 模块。模块核心芯片是 Nordic nRF52810。
 
-本项目使用 Ebyte E73-2G4M04S1A。按官方资料，该模块基于 Nordic nRF52810。
+## 重要说明
 
-开发时不要把它当 Nordic DK 使用。官方 SDK 的 `pca10040e` 只用于选择 nRF52810 相关工程配置，实际硬件引脚以 E73 模块和底板接线为准。
+Nordic SDK 里使用 `pca10040e` 示例，是为了匹配 nRF52810 的内存和 SoftDevice 配置，不代表本项目使用 Nordic DK。实际 GPIO、LED、按钮、蜂鸣器和传感器接线都以 EWT73 底板实测为准。
 
-## 必须确认的接线
+## 已验证板载资源
 
-### SWD
+| 功能 | GPIO | 当前用途 |
+| --- | --- | --- |
+| PWR LED | 不受固件控制 | 电源指示 |
+| P0.17 | 状态灯 | 环境 alarm 时快闪 |
+| P0.18 | 查找灯 | `findon` 查找提示 |
+| SW1 | P0.14 | 停止查找 |
+| SW2 | P0.13 | 停止查找 |
 
-```text
-VCC
-GND
-SWDIO
-SWDCLK
-RESET 可选
-```
+## 当前外设
 
-### GPIO 运行证明
-
-记录一个外接 LED 或可测量 GPIO：
+### AHT20
 
 ```text
-GPIO:
-连接方式:
-高电平是否点亮:
-串联电阻:
+AHT20 VIN -> EWT73 3V3
+AHT20 GND -> EWT73 GND
+AHT20 SCL -> EWT73 P0.12
+AHT20 SDA -> EWT73 P0.11
 ```
 
-### 当前 MVP 硬件
+注意：当前 AHT20 小板标的是 `VIN`，不是 `VCC`。如果 VIN 没接 3V3，固件会返回 `aht=fail`。
+
+### 无源蜂鸣器
 
 ```text
-供电: USB，暂不做电源开关
-状态 LED: P0.17，已验证可控
-查找 LED: P0.18，已验证可控
-按钮: 板载 SW1/SW2，GPIO 扫描已确认 SW1=P0.14，SW2=P0.13
-蜂鸣器: 无源蜂鸣器，待接线；需要 PWM 方波驱动
+蜂鸣器 + -> EWT73 P0.15
+蜂鸣器 - -> EWT73 GND
 ```
 
-### 板载按钮扫描记录
+蜂鸣器由 GPIO/PWM 驱动，不接 3V3。GND 是公共参考点，AHT20 和蜂鸣器可以共用 EWT73 GND。
 
-2026-06-14 使用临时 GPIO 扫描函数，通过 BLE Notify 输出 `button=P0.xx`。
+### GY-SGP
 
-当前观测：
+GY-SGP 作为后续气体 / VOC 扩展方向，目前 README 中只按计划项记录。正式接入前需要确认具体型号、I2C 地址、供电电压和驱动算法。
+
+## SWD 下载接线
+
+烧录和调试需要 J-Link / SWD，不是普通 USB-TTL。
 
 ```text
-SW1: P0.14
-SW2: P0.13
+J-Link VTref -> EWT73 3V3
+J-Link GND   -> EWT73 GND
+J-Link SWDIO -> EWT73 SWDIO
+J-Link SWCLK -> EWT73 SWCLK
+RESET        -> 可选
 ```
-
-说明：
-
-- 该记录来自当前 EWT73 测试板实测，不来自 Nordic DK 默认 `pca10040e` 板级定义。
-- `P0.06` / `P0.08` 暂不作为按键脚使用，资料显示它们更可能与 USB 转串口 TXD/RXD 跳帽相关。
-- `P0.17` / `P0.18` 已用于板载 LED。
-- `P0.21` 可能涉及 reset，未纳入按键扫描。
-
-## 待补充
-
-- E73 引脚图
-- 底板原理图
-- 下载器型号
-- 无源蜂鸣器接线 GPIO 和驱动方式

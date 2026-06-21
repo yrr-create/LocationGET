@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-The LocationGET firmware has a working BLE asset-tag control loop using nRF Connect:
+The AssetTracker firmware has a working BLE asset-tag control loop using nRF Connect:
 
 ```text
 nRF Connect writes to BLE UART RX -> E73 board executes command
@@ -63,4 +63,3 @@ findon  -> LED blink + buzzer sound
 findoff -> LED off + buzzer off
 button  -> LED off + buzzer off + state=normal
 ```
-
