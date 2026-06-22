@@ -6,7 +6,7 @@
 
 项目名称：AssetTracker
 
-目标：做一个 BLE 仓库资产标签原型。标签可被手机扫描和连接，可通过 BLE 命令触发查找，可用 LED / 蜂鸣器提示位置，并能上报温湿度环境状态。
+目标：做一个 BLE 仓库资产标签原型。标签可被手机扫描和连接，可通过 BLE 命令触发查找，可用 LED / 蜂鸣器提示位置，并能上报温湿度和环境风险状态。
 
 项目不再走 GPS 坐标上报路线。当前板子没有 GPS，资产位置由手机或网关通过 RSSI、最后出现时间和区域记录来推断。
 
@@ -88,8 +88,37 @@ AHT20 SDA -> EWT73 P0.11
 id=L4-001,bat=100,state=normal,aht=ok,temp=32.2,hum=73.8,env=warning
 ```
 
+### 2026-06-22 GY-SGP I2C Bring-up
+
+- GY-SGP 已接入同一组 I2C 总线。
+- AHT20 和 GY-SGP 可以同时挂在 `P0.11 SDA` / `P0.12 SCL`。
+- AHT20 地址：`0x38`。
+- GY-SGP 地址：`0x59`。
+
+当前接线：
+
+```text
+GY-SGP VIN -> EWT73 3V3
+GY-SGP GND -> EWT73 GND
+GY-SGP SCL -> EWT73 P0.12
+GY-SGP SDA -> EWT73 P0.11
+```
+
+验证结果：
+
+```text
+i2c=0x38,0x59,
+```
+
+调试结论：
+
+- 使用 `nrf_drv_twi_rx()` 直接读扫描时，只能看到 AHT20 的 `0x38`。
+- 改成地址写探测后，可以看到 `0x38` 和 `0x59`。
+- 说明 GY-SGP 接线和 I2C 地址验证通过，下一步再做 SGP 数据读取。
+
 ## Next
 
-- 接入 GY-SGP 气体 / VOC 传感器前，先确认具体型号、供电和 I2C 地址。
+- 对 `0x59` 发 GY-SGP / SGP40 命令，先验证 `sgp=ok`。
+- 稳定后再把状态字段扩展成 `gas` / `voc` / `sgp`。
 - 做 Android App MVP：扫描、RSSI、连接、状态显示、查找按钮。
 - 决定是否把当前 Nordic SDK 示例整理成仓库内独立固件工程。

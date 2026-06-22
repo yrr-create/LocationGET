@@ -27,7 +27,33 @@ AHT20 SCL -> EWT73 P0.12
 AHT20 SDA -> EWT73 P0.11
 ```
 
-注意：当前 AHT20 小板标的是 `VIN`，不是 `VCC`。如果 VIN 没接 3V3，固件会返回 `aht=fail`。
+说明：
+
+- 当前 AHT20 小板标的是 `VIN`，不是 `VCC`。
+- 如果 VIN 没接 3V3，固件会返回 `aht=fail`。
+- 已验证 I2C 地址：`0x38`。
+
+### GY-SGP
+
+```text
+GY-SGP VIN -> EWT73 3V3
+GY-SGP GND -> EWT73 GND
+GY-SGP SCL -> EWT73 P0.12
+GY-SGP SDA -> EWT73 P0.11
+```
+
+说明：
+
+- GY-SGP 和 AHT20 共用同一组 I2C：`P0.11 SDA` / `P0.12 SCL`。
+- 已验证 I2C 地址：`0x59`。
+- 早期用 `nrf_drv_twi_rx()` 直接读扫描时，只能扫到 AHT20 的 `0x38`。
+- 改为地址写探测后，可以同时扫到 `0x38` 和 `0x59`。
+
+当前扫描结果：
+
+```text
+i2c=0x38,0x59,
+```
 
 ### 无源蜂鸣器
 
@@ -36,11 +62,7 @@ AHT20 SDA -> EWT73 P0.11
 蜂鸣器 - -> EWT73 GND
 ```
 
-蜂鸣器由 GPIO/PWM 驱动，不接 3V3。GND 是公共参考点，AHT20 和蜂鸣器可以共用 EWT73 GND。
-
-### GY-SGP
-
-GY-SGP 作为后续气体 / VOC 扩展方向，目前 README 中只按计划项记录。正式接入前需要确认具体型号、I2C 地址、供电电压和驱动算法。
+蜂鸣器由 GPIO/PWM 驱动，不接 3V3。GND 是公共参考点，AHT20、GY-SGP 和蜂鸣器可以共用 EWT73 GND。
 
 ## SWD 下载接线
 
