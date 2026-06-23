@@ -1,43 +1,51 @@
-# Firmware Notes
+# Firmware
 
-固件基于 Nordic nRF5 SDK 的 BLE UART / Nordic UART Service 示例改造。
+Firmware is based on Nordic nRF5 SDK BLE UART / Nordic UART Service.
 
-## SDK 约定
-
-本仓库不提交完整 nRF5 SDK。当前本机 SDK 路径：
+The full Nordic SDK is not stored in this repository. The current local SDK path is:
 
 ```text
 G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560
 ```
 
-当前主要工程：
+The working SES project is:
 
 ```text
 G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\examples\ble_peripheral\ble_app_uart\pca10040e\s112\ses\ble_app_uart_pca10040e_s112.emProject
 ```
 
-`pca10040e` 是 Nordic 给 nRF52810 示例使用的工程配置，不是本项目的真实开发板型号。
+`pca10040e` is Nordic's nRF52810 example target. The real hardware is the Ebyte E73-2G4M04S1A module on the EWT73 test board.
 
-## 烧录顺序
+## Current Firmware Snapshot
 
-BLE 工程需要 S112 SoftDevice。第一次烧录或擦全片后：
+The current project code is copied into:
 
-1. `eraseall`
-2. 烧录 S112 SoftDevice
-3. 烧录 application hex
-4. reset
+```text
+firmware\sdk_overlay\examples\ble_peripheral\ble_app_uart
+```
 
-后续只改应用层时，通常只烧 application hex 并 reset。仓库根目录的 `burn.bat` 用于这个日常流程。
+This is not a standalone SDK. It is a record of the files changed from the Nordic example:
 
-## 当前 BLE 协议
+```text
+main.c
+l4_sensor\sensirion_arch_config.h
+l4_sensor\sensirion_voc_algorithm.c
+l4_sensor\sensirion_voc_algorithm.h
+pca10040e\s112\config\sdk_config.h
+pca10040e\s112\ses\ble_app_uart_pca10040e_s112.emProject
+```
 
-设备名：
+To rebuild from a clean SDK, copy these files back to the same relative paths under `examples\ble_peripheral\ble_app_uart`.
+
+## Device Protocol
+
+BLE name:
 
 ```text
 L4
 ```
 
-当前命令：
+Commands:
 
 ```text
 findon
@@ -45,71 +53,47 @@ findoff
 s?
 ```
 
-当前返回示例：
+Example status:
 
 ```text
-id=L4-001,bat=100,state=normal,aht=ok,temp=32.2,hum=73.8,env=warning
-id=L4-001,bat=100,state=finding,aht=ok,temp=32.2,hum=73.8,env=warning
-id=L4-001,bat=100,state=normal,aht=fail
+id=L4-001,bat=100,state=normal,aht=ok,temp=30.0,hum=60.1,env=normal,sgp=ok,sgp_raw=30843,voc=88
 ```
 
-`bat=100` 目前是占位值，还没有真实电池采样。
+Fields:
 
-## 当前功能点
+- `state`: `normal` or `finding`
+- `aht`: AHT20 read status
+- `temp`: temperature in Celsius
+- `hum`: relative humidity percent
+- `env`: temperature/humidity state, currently `normal`, `warning`, or `alarm`
+- `sgp`: SGP40 read status
+- `sgp_raw`: raw SGP40 signal for debugging
+- `voc`: Sensirion VOC Index result
 
-- NUS RX 接收手机命令。
-- NUS TX Notify 返回状态。
-- `findon` 控制 P0.18 查找灯和 P0.15 蜂鸣器。
-- `findoff` 或板载按钮停止查找。
-- AHT20 通过 TWI/I2C 读取温湿度。
-- 温湿度超过阈值后返回 `env=warning` 或 `env=alarm`。
-- `env=alarm` 且非查找状态时，P0.17 快闪，蜂鸣器低频报警。
+`bat=100` is still a placeholder. There is no real battery measurement yet.
 
-## AHT20 / TWI
+## Current Hardware Features
 
-需要在 SES 工程中加入两个源文件，否则会出现 TWI 链接错误：
+- BLE UART command and notify path
+- `findon`: P0.18 find LED and P0.15 buzzer
+- `findoff`: stops find LED and buzzer
+- Board button: stops finding
+- AHT20 temperature/humidity over I2C
+- GY-SGP / SGP40 raw gas signal over I2C
+- Sensirion VOC Index calculation
+- Background sensor sampling; `s?` returns cached values
 
-```text
-G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\integration\nrfx\legacy\nrf_drv_twi.c
-G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\modules\nrfx\drivers\src\nrfx_twi.c
+## Burn
+
+For normal application updates:
+
+```powershell
+cd G:\Personalportfolio\AssetTracker
+.\burn.bat
 ```
 
-`sdk_config.h` 需要打开：
+For a fully erased chip, burn S112 first, then the application.
 
-```c
-#define NRFX_TWI_ENABLED 1
-#define NRFX_TWI0_ENABLED 1
-#define TWI_ENABLED 1
-#define TWI0_ENABLED 1
-#define TWI0_USE_EASY_DMA 0
-```
+## Notes
 
-当前接线：
-
-```text
-AHT20 VIN -> EWT73 3V3
-AHT20 GND -> EWT73 GND
-AHT20 SCL -> EWT73 P0.12
-AHT20 SDA -> EWT73 P0.11
-```
-
-## 蜂鸣器
-
-当前接线：
-
-```text
-Passive buzzer + -> EWT73 P0.15
-Passive buzzer - -> EWT73 GND
-```
-
-当前策略：
-
-- 查找状态下持续间歇鸣叫。
-- 环境 alarm 且不在查找状态时，低频报警。
-- warning 不响，只通过 BLE 状态字段提示。
-
-## 已保存 patch
-
-`firmware/patches/` 记录的是开发过程中的关键补丁。部分早期 patch 里仍有旧字符串，例如 `hello from LocationGET`，它们是历史记录，不代表当前最终固件协议。
-
-当前正式说明以本文件和仓库根目录 README 为准。
+The app should decide how to display `voc`, `temp`, `hum`, and alarm levels. Firmware keeps the returned field names stable and avoids UI wording.

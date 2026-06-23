@@ -1,0 +1,2 @@
+nrfjprog --family NRF52 --program "G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\examples\ble_peripheral\ble_app_uart\pca10040e\s112\ses\Output\Release\Exe\ble_app_uart_pca10040e_s112.hex" --verify --sectorerase --clockspeed 100
+nrfjprog --family NRF52 --reset --clockspeed 100

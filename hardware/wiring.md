@@ -19,6 +19,22 @@ Notes:
   `aht=fail`.
 - The I2C address used by the firmware is `0x38`.
 
+## GY-SGP / SGP40 Gas Sensor
+
+```text
+GY-SGP VIN -> EWT73 3V3
+GY-SGP GND -> EWT73 GND
+GY-SGP SCL -> EWT73 P0.12
+GY-SGP SDA -> EWT73 P0.11
+```
+
+Notes:
+
+- AHT20 and GY-SGP share the same I2C bus.
+- The SGP40 I2C address used by the firmware is `0x59`.
+- Current firmware sends both `sgp_raw` and Sensirion `voc` index. The app should
+  decide how to display or classify those values.
+
 ## Passive Buzzer
 
 ```text
