@@ -23,3 +23,9 @@ NordicSDK/
 # Local installers and machine-specific shortcuts
 environment/*.exe
 environment/*.lnk
+
+# Local vendor reference files
+hardware/vendor/*.pdf
+
+# Temporary screenshots
+notes/powershell.png
